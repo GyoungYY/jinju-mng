@@ -61,6 +61,7 @@ export default {
 .left-bar {
   width: 200px;
   height: 100%;
+  min-height: 600px;
   background-color: rgb(84, 92, 100);
   position: absolute;
   left: 0;
