@@ -17,7 +17,7 @@ export default {
 
     //通过金句
     passJinju(params) {
-        return fetch.post(API + '/admin/jinju/audit', params, 'json').then(response => {
+        return fetch.post(API + '/admin/jinju/audit', params).then(response => {
             if (response.code === 0) {
                 return response.message;
             } else {
@@ -28,7 +28,7 @@ export default {
 
     //驳回金句
     rejectJinju(params) {
-        return fetch.post(API + '/admin/jinju/delete', params, 'json').then(response => {
+        return fetch.post(API + '/admin/jinju/delete', params).then(response => {
             if (response.code === 0) {
                 return response.message;
             } else {
