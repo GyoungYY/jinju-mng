@@ -7,36 +7,19 @@
      
      <el-card class="box-card" v-for="(item,index) in jinjuList" :key="item.index">
             <div slot="header">
-                <!-- <img :src="item.photoUrl" alt="" style="width: 40px;height: 40px;border-radius:20px;cursor:pointer;" @click="gotoUserPage(item.userId)">
-                <div style="padding-left:10px;">
-                    <div style="padding-bottom:3px;">
-                        <span class="item-username">{{item.username}}</span>
-                    </div>
-                    <span style="color:#aaa;">{{item.createTimeShow}}</span>
-                </div> -->
-                <el-tag :type="item.itemTagClass" class="item-tag">{{item.typeShow}}</el-tag>
+                <el-select v-model="item.type" placeholder="请选择" style="width:120px;">
+                    <el-option label="搞笑" :value="1"></el-option>
+                    <el-option label="情感" :value="2"></el-option>
+                    <el-option label="热点" :value="3"></el-option>
+                </el-select>
+                <span style="padding-left:20px;color:#999;">来源于：{{item.source}}</span>
                 <div style="float:right;">
-                    <el-button type="primary" size="small">通过</el-button>
-                    <el-button type="danger" size="small">驳回</el-button>
+                    <el-button type="primary" size="small" @click="passJinju(item)">通过</el-button>
+                    <el-button type="danger" size="small" @click="rejectJinju(item)">驳回</el-button>
                 </div>
             </div>
             <div class="item-content">
                 {{item.content}}
-            </div>
-            <div style="color:#999;">
-                <!-- <el-tag :type="item.itemTagClass" class="item-tag">{{item.typeShow}}</el-tag> -->
-                <!-- <span :class="{'clicked': item.isCollect}" class="glyphicon glyphicon-star-empty" style="float:right;cursor:pointer;" @click="collectClick(item)">
-                    <span style="padding:0 10px;">{{item.collectCount}}</span>
-                </span>
-                <span class="glyphicon glyphicon-comment" style="float:right;padding-right:10px;cursor:pointer;">
-                    <span style="padding:0 10px;">{{item.commentCount}}</span>
-                </span>
-                <span :class="{'clicked': item.upOrDownVote === 2}" class="glyphicon glyphicon-thumbs-down" style="float:right;padding-right:10px;cursor:pointer;" @click="downVoteClick(item)">
-                    <span style="padding:0 10px;">{{item.downVoteCount}}</span>
-                </span>
-                <span :class="{'clicked': item.upOrDownVote === 1}" class="glyphicon glyphicon-thumbs-up" style="float:right;padding-right:10px;cursor:pointer;" @click="upVoteClick(item)">
-                    <span style="padding:0 10px;">{{item.upVoteCount}}</span>
-                </span> -->
             </div>
         </el-card>
 
@@ -91,9 +74,8 @@ export default {
       JinjuInterface.getJinjuList(this.searchParams).then(data => {
         this.isLoading = false;
         this.jinjuList = data.list.map(item => {
-          item.typeShow = this.typeEnum[item.type];
-          item.itemTagClass = this.tagClass[item.type];
           item.createTimeShow = formatTime.getFormatTime(item.createTime);
+          item.type = 1;
           return item;
         });
         this.total = data.total;
@@ -106,74 +88,24 @@ export default {
       scrollFunc.gotoTop();
     },
 
-    //进入用户个人主页
-    gotoUserPage(id) {
-      //   this.$router.push({ path: "/index/userPage/" + id });
+    //通过
+    passJinju(item) {
+      let params = {
+        id: item.id,
+        type: item.type
+      };
+      JinjuInterface.passJinju(params).then(data => {
+        this.$message.success("操作成功");
+        this.getJinjuList(this.searchParams.pageIndex);
+      });
     },
 
-    //点击赞按钮
-    upVoteClick(item) {
-      let type = item.upOrDownVote === 1 ? 2 : 1; //1赞，2取消
-      JinjuInterface.upVote(item.jinjuId, type)
-        .then(data => {
-          this.$message.success(data);
-          if (type === 1 && item.upOrDownVote != 2) {
-            item.upVoteCount += 1;
-            item.upOrDownVote = 1;
-          } else if (type === 1 && item.upOrDownVote == 2) {
-            item.upVoteCount += 1;
-            item.downVoteCount -= 1;
-            item.upOrDownVote = 1;
-          } else if (type === 2) {
-            item.upVoteCount -= 1;
-            item.upOrDownVote = "";
-          }
-        })
-        .catch(reason => {
-          this.$message.error(reason);
-        });
-    },
-
-    //点击踩按钮
-    downVoteClick(item) {
-      let type = item.upOrDownVote === 2 ? 2 : 1; //1踩，2取消
-      JinjuInterface.downVote(item.jinjuId, type)
-        .then(data => {
-          this.$message.success(data);
-          if (type === 1 && item.upOrDownVote != 1) {
-            item.downVoteCount += 1;
-            item.upOrDownVote = 2;
-          } else if (type === 1 && item.upOrDownVote == 1) {
-            item.downVoteCount += 1;
-            item.upVoteCount -= 1;
-            item.upOrDownVote = 2;
-          } else if (type === 2) {
-            item.downVoteCount -= 1;
-            item.upOrDownVote = "";
-          }
-        })
-        .catch(reason => {
-          this.$message.error(reason);
-        });
-    },
-
-    //点击收藏
-    collectClick(item) {
-      let type = item.isCollect ? 2 : 1; //1收藏，2取消
-      JinjuInterface.collect(item.jinjuId, type)
-        .then(data => {
-          this.$message.success(data);
-          if (type === 1) {
-            item.collectCount += 1;
-            item.isCollect = true;
-          } else if (type === 2) {
-            item.collectCount -= 1;
-            item.isCollect = false;
-          }
-        })
-        .catch(reason => {
-          this.$message.error(reason);
-        });
+    //驳回
+    rejectJinju(item) {
+      JinjuInterface.rejectJinju({ id: item.id }).then(data => {
+        this.$message.success("操作成功");
+        this.getJinjuList(this.searchParams.pageIndex);
+      });
     }
   }
 };
@@ -181,7 +113,8 @@ export default {
 
 <style scoped>
 .bread-crumb {
-  padding: 10px;
+  padding: 12px;
+  margin-bottom: 20px;
   background-color: #ddd;
 }
 
