@@ -2,6 +2,7 @@
   <div>
       <div class="header">
           jinjumao管理后台
+          <span style="font-size:16px;float:right;padding-top:10px;">{{userInfo.username}}</span>
       </div>
       <div class="bar-content">
             <div class="left-bar">
@@ -39,7 +40,9 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+        userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
+    };
   },
   methods: {
     itemSelect(index) {

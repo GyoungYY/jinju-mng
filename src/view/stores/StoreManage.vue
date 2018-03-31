@@ -15,37 +15,37 @@
     style="width: 100%">
     <el-table-column
       fixed
-      prop="date"
+      prop="id"
       label="店铺id"
       width="150">
     </el-table-column>
     <el-table-column
-      prop="name"
+      prop="shopName"
       label="店铺名"
       width="120">
     </el-table-column>
     <el-table-column
-      prop="name"
+      prop="shopLogo"
       label="店铺logo"
-      width="120">
+      width="180">
     </el-table-column>
     <el-table-column
-      prop="province"
+      prop="shopTypeShow"
       label="店铺类型"
       width="120">
     </el-table-column>
     <el-table-column
-      prop="city"
+      prop="userId"
       label="所属用户id"
       width="120">
     </el-table-column>
     <el-table-column
-      prop="address"
+      prop="userId"
       label="所属用户名称"
       width="120">
     </el-table-column>
     <el-table-column
-      prop="zip"
+      prop="createTimeShow"
       label="创建日期">
     </el-table-column>
     <el-table-column
@@ -53,7 +53,7 @@
       label="操作"
       width="100">
       <template slot-scope="scope">
-        <el-button @click="editStore()" type="text" size="small">编辑</el-button>
+        <el-button @click="editStore(scope.row)" type="text" size="small">编辑</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -61,10 +61,10 @@
   <el-pagination
             background
             @current-change="handleCurrentChange"
-            :current-page="1"
-            :page-size="10"
+            :current-page="searchParams.pageIndex"
+            :page-size="searchParams.pageSize"
             layout="total, prev, pager, next, jumper"
-            :total="0" class="pagination">
+            :total="total" class="pagination">
         </el-pagination>
 
   <add-store-dialog v-if="addDialogShow" :dialogFormVisible="addDialogShow" @cancel="closeDialog" :storeData="itemData"></add-store-dialog>
@@ -74,6 +74,7 @@
 <script>
 import AddStoreDialog from "./AddStoreDialog.vue";
 import StoreInterface from "@/interface/StoreInterface";
+import formatTime from "@/common/js/formatTime";
 
 export default {
   components: {
@@ -89,6 +90,10 @@ export default {
       },
       storeList: [],
       total: 0,
+      shopTypes:{
+          1: '图像书籍类',
+          2: '服装类',
+      }
     };
   },
   mounted(){
@@ -100,7 +105,8 @@ export default {
       getStoreList(){
           StoreInterface.getStoreList(this.searchParams).then(data => {
         this.storeList = data.list.map(item => {
-          
+            item.shopTypeShow = this.shopTypes[item.shopType];
+          item.createTimeShow = formatTime.getFormatTime(item.createTime);
           return item;
         });
         this.total = data.total;
@@ -113,14 +119,16 @@ export default {
       this.itemData = {};
     },
 
+    //关闭弹框
     closeDialog() {
       this.addDialogShow = false;
+      this.getStoreList();
     },
 
     //编辑店铺
-    editStore() {
+    editStore(item) {
       this.addDialogShow = true;
-      this.itemData = {};
+      this.itemData = item;
     },
 
     handleCurrentChange(page) {}

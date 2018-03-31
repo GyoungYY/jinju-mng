@@ -17,7 +17,7 @@ export default {
 
     //增加店铺
     addStore(params) {
-        return fetch.post(API + '/shop/create', params).then(response => {
+        return fetch.post(API + '/shop/create', params,'json').then(response => {
             if (response.code === 0) {
                 return response.message;
             } else {

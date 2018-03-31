@@ -1,14 +1,14 @@
 <template>
   <div>
     <el-dialog title="新增/修改店铺" :visible.sync="dialogFormVisible" :before-close="onCancel" width="60%">
-  <el-form :model="form">
+  <el-form>
     <el-form-item label="店铺名称" :label-width="formLabelWidth">
-      <el-input v-model="form.name" auto-complete="off"></el-input>
+      <el-input v-model="storeData.shopName" auto-complete="off"></el-input>
     </el-form-item>
     <el-form-item label="店铺类型" :label-width="formLabelWidth">
-      <el-select v-model="form.region" placeholder="请选择店铺类型">
-        <el-option label="类型一" value="shanghai"></el-option>
-        <el-option label="类型二" value="beijing"></el-option>
+      <el-select v-model="storeData.shopType" placeholder="请选择店铺类型">
+        <el-option label="图像书籍类" :value="1"></el-option>
+        <el-option label="服装类" :value="2"></el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="店铺logo" :label-width="formLabelWidth">
@@ -19,18 +19,18 @@
                             :data="postData"
                             :on-success="handleAvatarSuccess"
                             :before-upload="beforeAvatarUpload">
-                            <img v-if="storeData.imageUrl" :src="storeData.imageUrl" class="avatar">
+                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
     </el-form-item>
     <el-form-item label="所属用户ID" :label-width="formLabelWidth">
-      <el-input v-model="form.name" auto-complete="off"></el-input>
+      <el-input v-model="storeData.userId" auto-complete="off"></el-input>
     </el-form-item>
 
   </el-form>
   <div slot="footer" class="dialog-footer">
     <el-button @click="onCancel()">取 消</el-button>
-    <el-button type="primary" @click="onCancel()">确 定</el-button>
+    <el-button type="primary" @click="confirm()">确 定</el-button>
   </div>
 </el-dialog>
   </div>
@@ -45,21 +45,16 @@ export default {
   data() {
     return {
       formLabelWidth: "120px",
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
-      },
       postData: {
         token:
           "aI9GR6VbK_5gu3kwDj-eTFny-1Hi4sucXf5mQkeg:28x3c--LOhWr6E_R2qP9k_njr9I=:eyJzY29wZSI6Imppbmp1bWFvIiwiZGVhZGxpbmUiOjE1MTU4NTc3NTJ9"
-      }
+      },
+      imageUrl: '',
+
     };
+  },
+  mounted(){
+      this.getUploadToken();
   },
   methods: {
     onCancel: function() {
@@ -68,7 +63,7 @@ export default {
 
     //获取upload token
     getUploadToken() {
-      QiniuInterface.getUploadToken("2")
+      QiniuInterface.getUploadToken("3")
         .then(data => {
           this.postData.token = data;
         })
@@ -79,8 +74,8 @@ export default {
 
     //头像上传成功回调
     handleAvatarSuccess(res, file) {
-      this.storeData.imageUrl = URL.createObjectURL(file.raw);
-      this.storeData.coverImgUrl = res.key;
+      this.imageUrl = URL.createObjectURL(file.raw);
+      this.storeData.shopLogo = res.key;
     },
 
     beforeAvatarUpload(file) {
@@ -96,7 +91,14 @@ export default {
         this.$message.error("封面图片大小不能超过 2MB!");
       }
       return isJPG && isLt2M;
-    }
+    },
+
+    confirm(){
+        StoreInterface.addStore(this.storeData).then(data => {
+            this.$message.success('创建成功');
+            this.onCancel();
+      });
+    },
   }
 };
 </script>

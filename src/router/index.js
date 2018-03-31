@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import MainNav from '@/view/MainNav'
+import Login from '@/view/Login'
 import JinjuList from '@/view/jinju/JinjuList'
 
 import StoreManage from '@/view/stores/StoreManage'
@@ -11,6 +12,11 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
+      {
+        path: '/',
+        name: Login,
+        component: Login,
+      },
     {
       path: '/',
       name: 'MainNav',
