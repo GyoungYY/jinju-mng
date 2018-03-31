@@ -13,6 +13,7 @@
                     <el-option label="热点" :value="3"></el-option>
                 </el-select>
                 <span style="padding-left:20px;color:#999;">来源于：{{item.source}}</span>
+                <span style="padding-left:20px;color:#999;">{{item.createTimeShow}}</span>
                 <div style="float:right;">
                     <el-button type="primary" size="small" @click="passJinju(item)">通过</el-button>
                     <el-button type="danger" size="small" @click="rejectJinju(item)">驳回</el-button>
