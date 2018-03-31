@@ -38,6 +38,7 @@
 
 <script>
 import QiniuInterface from "@/interface/QiniuInterface";
+import StoreInterface from "@/interface/StoreInterface";
 
 export default {
   props: ["dialogFormVisible", "storeData"],

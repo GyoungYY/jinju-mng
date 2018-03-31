@@ -10,7 +10,7 @@
     </div>
 
     <el-table
-    :data="tableData"
+    :data="storeList"
     border
     style="width: 100%">
     <el-table-column
@@ -73,6 +73,8 @@
 
 <script>
 import AddStoreDialog from "./AddStoreDialog.vue";
+import StoreInterface from "@/interface/StoreInterface";
+
 export default {
   components: {
     AddStoreDialog
@@ -80,44 +82,31 @@ export default {
   data() {
     return {
       addDialogShow: false,
-      tableData: [
-        {
-          date: "1",
-          name: "金猫书城",
-          province: "图书",
-          city: "333",
-          address: "金段子",
-          zip: "2018-04-01"
-        },
-        {
-          date: "1",
-          name: "金猫书城",
-          province: "图书",
-          city: "333",
-          address: "金段子",
-          zip: "2018-04-01"
-        },
-        {
-          date: "1",
-          name: "金猫书城",
-          province: "图书",
-          city: "333",
-          address: "金段子",
-          zip: "2018-04-01"
-        },
-        {
-          date: "1",
-          name: "金猫书城",
-          province: "图书",
-          city: "333",
-          address: "金段子",
-          zip: "2018-04-01"
-        }
-      ],
-      itemData: {}
+      itemData: {},
+      searchParams:{
+          pageIndex: 1,
+          pageSize: 10,
+      },
+      storeList: [],
+      total: 0,
     };
   },
+  mounted(){
+      this.getStoreList();
+  },
   methods: {
+
+      //获取店铺列表
+      getStoreList(){
+          StoreInterface.getStoreList(this.searchParams).then(data => {
+        this.storeList = data.list.map(item => {
+          
+          return item;
+        });
+        this.total = data.total;
+      });
+      },
+
     //新增店铺
     addStore() {
       this.addDialogShow = true;
